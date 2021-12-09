@@ -17,6 +17,7 @@ const loginFormHandler = async (event) => {
       // If successful, redirect the browser to the dashboard page
       document.location.replace('/dashboard');
     } else {
+      console.log('err', response)
       alert(response.statusText);
     }
   }
@@ -45,6 +46,7 @@ const signupFormHandler = async (event) => {
     });
 
     if (response.ok) {
+      // If successful, redirect the browser to the dashboard page
       document.location.replace('/dashboard');
     } else {
       console.log('err', response)
