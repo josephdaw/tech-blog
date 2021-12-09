@@ -44,7 +44,7 @@ router.get('/posts/:id', async (req, res) => {
     res.render('post', {
       ...post,
       logged_in: req.session.logged_in,
-      pageTitle: ' | Posts',
+      pageTitle: ` | ${post.title}`,
     });
   } catch (err) {
     res.status(500).json(err);
