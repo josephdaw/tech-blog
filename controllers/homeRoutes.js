@@ -20,7 +20,8 @@ router.get('/', async (req, res) => {
     // Pass serialized data and session flag into template
     res.render('homepage', { 
       posts, 
-      logged_in: req.session.logged_in 
+      logged_in: req.session.logged_in,
+      pageTitle: '',
     });
   } catch (err) {
     res.status(500).json(err);
@@ -42,9 +43,32 @@ router.get('/posts/:id', async (req, res) => {
 
     res.render('post', {
       ...post,
-      logged_in: req.session.logged_in
+      logged_in: req.session.logged_in,
+      pageTitle: ' | Posts',
     });
   } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+router.get('/dashboard', withAuth, async (req, res) => {
+  try {
+    // Find the logged in user based on the session ID
+    const userData = await User.findByPk(req.session.user_id, {
+      attributes: { exclude: ['password'] },
+      include: [{ model: Post }],
+    });
+
+    const user = userData.get({ plain: true });
+    console.log(user);
+
+    res.render('dashboard', {
+      ...user,
+      logged_in: true,
+      pageTitle: ' | Dashboard',
+    });
+  } catch (err) {
+    console.log(err);
     res.status(500).json(err);
   }
 });
@@ -62,7 +86,8 @@ router.get('/profile', withAuth, async (req, res) => {
 
     res.render('profile', {
       ...user,
-      logged_in: true
+      logged_in: true,
+      pageTitle: ' | Profile',
     });
   } catch (err) {
     console.log(err);
@@ -77,7 +102,9 @@ router.get('/login', (req, res) => {
     return;
   }
 
-  res.render('login');
+  res.render('login', {
+    pageTitle: ' | Login',
+  });
 });
 
 module.exports = router;
