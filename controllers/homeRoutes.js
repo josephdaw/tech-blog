@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { Post, User } = require('../models');
+const { Post, User, Comment } = require('../models');
 const withAuth = require('../utils/auth');
 
 router.get('/', async (req, res) => {
@@ -30,23 +30,76 @@ router.get('/', async (req, res) => {
 
 router.get('/posts/:id', async (req, res) => {
   try {
+    // get post data, including the user who made the post
     const postData = await Post.findByPk(req.params.id, {
       include: [
-        {
-          model: User,
-          attributes: ['first_name'],
-        },
+        {model: User, attributes: { exclude: ['password'] },},
+        // {model: Comment, include: [{model: User}]},
       ],
     });
 
+    // get the comments associated with the selected post, including the user who made those comments
+    const commentData = await Comment.findAll({ 
+      where: { post_id: req.params.id },
+      include: [
+        { model: User, attributes: { exclude: ['password'] }, },
+      ],
+    });
+
+    // console.log("c.log postData:", postData)
+    // console.log("c.log commentData:", commentData)
+
+    // serialise the sequelize data
     const post = postData.get({ plain: true });
+
+    // have to iterate over the comments 
+    const comments = commentData.map(comment => comment.get({plain: true}));
+
+    // const comment = commentData.get({ plain: true });
+    
+    console.log("c.log post:",post);
+    console.log("c.log comments:", comments);
 
     res.render('post', {
       ...post,
+      ...comments,
       logged_in: req.session.logged_in,
       pageTitle: ` | ${post.title}`,
     });
   } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
+// TESTING
+router.get('/comments/:id', async (req, res) => {
+  try {
+    const commentData = await Comment.findAll({ 
+      where: { post_id: req.params.id },
+      include: [
+        {
+          model: User,
+          attributes: { exclude: ['password'] },
+        },
+      ],
+    });
+
+    const comments = commentData.map(comment => comment.get({plain: true}));
+
+    // console.log(commentData)
+    // const comment = commentData.get({ plain: true });
+    console.log(comments)
+
+    res.status(200).json("testing");
+
+    // res.render('post', {
+    //   ...comment,
+    //   logged_in: req.session.logged_in,
+    //   pageTitle: ` | ${comment.title}`,
+    // });
+  } catch (err) {
+    console.log(err);
     res.status(500).json(err);
   }
 });

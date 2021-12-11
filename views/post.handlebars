@@ -3,3 +3,10 @@
   <p>{{content}}</p>
   <p>Created by {{user.first_name}} on {{format_date date_created}}</p>
 </div>
+{{#if comments.length}}
+{{#each comments as |comment|}}
+<div class="text-center">
+  <p><strong>{{format_date comment.date_created}} - {{comment.user.first_name}}:</strong> {{comment.content}}</p>
+</div>
+{{/each}}
+{{/if}}
