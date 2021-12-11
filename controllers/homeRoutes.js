@@ -62,7 +62,7 @@ router.get('/posts/:id', async (req, res) => {
 
     res.render('post', {
       ...post,
-      ...comments,
+      comments,
       logged_in: req.session.logged_in,
       pageTitle: ` | ${post.title}`,
     });
