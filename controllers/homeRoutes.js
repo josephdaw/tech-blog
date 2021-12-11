@@ -103,7 +103,7 @@ router.get('/profile', withAuth, async (req, res) => {
       logged_in: true,
       pageTitle: ' | Profile',
     });
-    
+
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
