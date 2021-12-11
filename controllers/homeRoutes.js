@@ -46,19 +46,11 @@ router.get('/posts/:id', async (req, res) => {
       ],
     });
 
-    // console.log("c.log postData:", postData)
-    // console.log("c.log commentData:", commentData)
-
-    // serialise the sequelize data
+    // serialize the sequelize data
     const post = postData.get({ plain: true });
 
-    // have to iterate over the comments 
+    // have to iterate over each comment to serialize
     const comments = commentData.map(comment => comment.get({plain: true}));
-
-    // const comment = commentData.get({ plain: true });
-    
-    console.log("c.log post:",post);
-    console.log("c.log comments:", comments);
 
     res.render('post', {
       ...post,
@@ -66,43 +58,14 @@ router.get('/posts/:id', async (req, res) => {
       logged_in: req.session.logged_in,
       pageTitle: ` | ${post.title}`,
     });
+
   } catch (err) {
+
     console.log(err);
     res.status(500).json(err);
   }
 });
 
-// TESTING
-router.get('/comments/:id', async (req, res) => {
-  try {
-    const commentData = await Comment.findAll({ 
-      where: { post_id: req.params.id },
-      include: [
-        {
-          model: User,
-          attributes: { exclude: ['password'] },
-        },
-      ],
-    });
-
-    const comments = commentData.map(comment => comment.get({plain: true}));
-
-    // console.log(commentData)
-    // const comment = commentData.get({ plain: true });
-    console.log(comments)
-
-    res.status(200).json("testing");
-
-    // res.render('post', {
-    //   ...comment,
-    //   logged_in: req.session.logged_in,
-    //   pageTitle: ` | ${comment.title}`,
-    // });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json(err);
-  }
-});
 
 router.get('/dashboard', withAuth, async (req, res) => {
   try {
