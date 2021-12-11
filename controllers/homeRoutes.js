@@ -7,10 +7,7 @@ router.get('/', async (req, res) => {
     // Get all posts and JOIN with user data
     const postData = await Post.findAll({
       include: [
-        {
-          model: User,
-          attributes: ['first_name'],
-        },
+        { model: User, attributes: ['first_name'], },
       ],
     });
 
@@ -18,12 +15,14 @@ router.get('/', async (req, res) => {
     const posts = postData.map((post) => post.get({ plain: true }));
 
     // Pass serialized data and session flag into template
-    res.render('homepage', { 
-      posts, 
+    res.render('homepage', {
+      posts,
       logged_in: req.session.logged_in,
       pageTitle: '',
     });
+
   } catch (err) {
+    console.log(err)
     res.status(500).json(err);
   }
 });
@@ -33,13 +32,13 @@ router.get('/posts/:id', async (req, res) => {
     // get post data, including the user who made the post
     const postData = await Post.findByPk(req.params.id, {
       include: [
-        {model: User, attributes: { exclude: ['password'] },},
+        { model: User, attributes: { exclude: ['password'] }, },
         // {model: Comment, include: [{model: User}]},
       ],
     });
 
     // get the comments associated with the selected post, including the user who made those comments
-    const commentData = await Comment.findAll({ 
+    const commentData = await Comment.findAll({
       where: { post_id: req.params.id },
       include: [
         { model: User, attributes: { exclude: ['password'] }, },
@@ -50,7 +49,7 @@ router.get('/posts/:id', async (req, res) => {
     const post = postData.get({ plain: true });
 
     // have to iterate over each comment to serialize
-    const comments = commentData.map(comment => comment.get({plain: true}));
+    const comments = commentData.map(comment => comment.get({ plain: true }));
 
     res.render('post', {
       ...post,
@@ -60,7 +59,6 @@ router.get('/posts/:id', async (req, res) => {
     });
 
   } catch (err) {
-
     console.log(err);
     res.status(500).json(err);
   }
@@ -83,6 +81,7 @@ router.get('/dashboard', withAuth, async (req, res) => {
       logged_in: true,
       pageTitle: ' | Dashboard',
     });
+
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
@@ -104,6 +103,7 @@ router.get('/profile', withAuth, async (req, res) => {
       logged_in: true,
       pageTitle: ' | Profile',
     });
+    
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
